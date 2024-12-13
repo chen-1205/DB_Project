@@ -11,6 +11,7 @@ def index():
 # GET=取得表單
 # POST=接收表單資料
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -58,6 +59,7 @@ def cart():
     total_price = sum(item.product.ptice * item.quantity for item in cart_items)
     return render_template('cart.html', cart_items=cart_items)
 
+# 新增到購物車
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     if 'user_id' not in session:
@@ -66,6 +68,33 @@ def add_to_cart(product_id):
 
     user_id = session['user_id']
     product = Product.query.getor404(product_id)
+
     cart_item = CartItem.query.filter_by(user_id=user_id, product_id=product_id).first()
     if cart_item:
         cart_item.quantity += 1
+    else:
+        cart_item = CartItem(user_id=user_id, product_id=product_id, quantity=1)
+        db.session.add(cart_item)
+    
+    db.session.commit()
+    flash(f'Added {product.name} to your cart.')
+    return redirect(url_for('index'))
+
+
+@app.route('/remove_from_cart/<int:cart_item_id>', method=['POST'])
+def remove_from_cart(cart_item_id):
+    if 'user_id' not in session:
+        flash('請先登錄！')
+        return redirect(url_for('login'))
+    
+    cart_item = CartItem.query.get_or_404(cart_item_id)
+    db.session.delete(cart_item)
+    db.session.commit()
+    flash('商品已從購物車移除！')
+    return redirect(url_for('cart'))
+
+@app.route('/checkout', method=['POST'])
+def checkout():
+    if 'user_id' not in session:
+        flash('請先登錄！')
+        return redirect(url_for('login'))
