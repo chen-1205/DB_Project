@@ -10,7 +10,8 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from . import routes
-        db.create_all()
-    
+        # 延遲導入並註冊 Blueprint
+        from .routes import main
+        app.register_blueprint(main)
+
     return app
