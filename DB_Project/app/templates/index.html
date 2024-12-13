@@ -4,30 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品列表</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>商品列表</h1>
-    {% if session.get('user_name') %}
-        <p>歡迎, {{ session['user_name'] }}!</p>
-        <a href="{{ url_for('main.logout') }}">登出</a>
-    {% else %}
-        <a href="{{ url_for('main.login') }}">登錄</a>
-        <a href="{{ url_for('main.register') }}">註冊</a>
-    {% endif %}
-    <a href="{{ url_for('main.cart') }}">查看購物車</a>
-    <hr>
-    <ul>
-        {% for product in products %}
-        <li>
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.description }}</p>
-            <p>價格: ${{ product.price }}</p>
-            <p>庫存: {{ product.stock }}</p>
-            <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST">
-                <button type="submit">加入購物車</button>
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="container mt-4">
+        <!-- 頁面標題 -->
+        <header class="mb-4">
+            <h1 class="text-center">商品列表</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {% if session.get('user_name') %}
+                        <p>歡迎, <strong>{{ session['user_name'] }}</strong>!</p>
+                        <a href="{{ url_for('main.logout') }}" class="btn btn-danger btn-sm">登出</a>
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-sm">登錄</a>
+                        <a href="{{ url_for('main.register') }}" class="btn btn-secondary btn-sm">註冊</a>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('main.cart') }}" class="btn btn-warning btn-sm">查看購物車</a>
+            </div>
+        </header>
+
+        <!-- 商品列表 -->
+        <hr>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                        <p class="card-text"><strong>價格:</strong> ${{ product.price }}</p>
+                        <p class="card-text"><strong>庫存:</strong> {{ product.stock }}</p>
+                        <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST">
+                            <button type="submit" class="btn btn-success w-100">加入購物車</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
