@@ -24,7 +24,11 @@ class OrderItem(db.Model):
     id = db.Column(db.Integer, Primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product_name = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+
+    order = db.relationship('Order', backref='order_items')
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, Primary_key=True)

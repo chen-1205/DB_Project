@@ -20,7 +20,11 @@ def register():
         password = request.form['password']
         hashed_password = generate_password_hash(password)
 
-        new_user = User(name=name, email=email, password=hashed_password)
+        new_user = User(
+            name=name, 
+            email=email,   
+            password=hashed_password
+        )
         db.session.add(new_user) #新增用戶
         db.session.commit()
         flash('註冊成功！請登錄。')
@@ -80,7 +84,7 @@ def add_to_cart(product_id):
     flash(f'Added {product.name} to your cart.')
     return redirect(url_for('index'))
 
-
+# 從購物車移除
 @app.route('/remove_from_cart/<int:cart_item_id>', method=['POST'])
 def remove_from_cart(cart_item_id):
     if 'user_id' not in session:
@@ -98,3 +102,47 @@ def checkout():
     if 'user_id' not in session:
         flash('請先登錄！')
         return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    cart_item = CartItem.query.filter_by(user_id=user_id).all()
+    if not cart_item:
+        flash('購物車是空的！')
+        return redirect(url_for('index'))
+
+    total_price = sum(item.product.price * item.quantity for item in cart_item)
+    new_order = Order(
+        user_id=user_id, 
+        total_price=total_price,
+        status='待處理'
+    )
+    db.session.add(new_order)
+    db.session.commit()
+
+    for item in cart_item:
+        order_item = OrderItem(
+            order_id=new_order.id,
+            product_id=item.product.id,
+            product_name=item.product.name,
+            quantity=item.quantity,
+            price=item.product.price
+        )
+        db.session.add(order_item)
+
+        item.product.stock -= item.quantity
+        db.session.delete(item)   
+
+    db.session.commit()
+
+    flash('訂單成立！')
+    return redirect(url_for('orders'))
+
+@app.route('/orders', method=['GET'])
+def orders():
+    if 'user_id' not in session:
+        flash('請先登錄！')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    orders = Order.query.filter_by(user_id=user_id).all()
+    return render_template('orders.html', orders=orders)
+
