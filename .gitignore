@@ -1,0 +1,14 @@
+# Python相關
+*.pyc
+*.pyo
+__pycache__/
+
+# 虛擬環境
+venv/
+
+# 資料庫文件
+*.db
+
+# IDE相關
+.vscode/
+.idea/
