@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>購物車</h1>
+        <form action="{{ url_for('main.checkout') }}" method="POST">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名稱</th>
+                        <th>數量</th>
+                        <th>價格</th>
+                        <th>小計</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <form action="{{ url_for('main.update_cart_item', cart_item_id=item.id) }}" method="POST" style="display: inline;">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 50px;">
+                                <button type="submit">更新</button>
+                            </form>
+                        </td>
+                        <td>${{ item.product.price }}</td>
+                        <td>${{ item.product.price * item.quantity }}</td>
+                        <td>
+                            <form action="{{ url_for('main.remove_from_cart', cart_item_id=item.id) }}" method="POST">
+                                <button type="submit">移除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="actions">
+                <strong>總價格: ${{ total_price }}</strong>
+                <button type="submit">結帳</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

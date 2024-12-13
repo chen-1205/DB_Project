@@ -3,51 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <form action="{{ url_for('main.search') }}" method="GET" style="margin-bottom: 20px;">
+        <input type="text" name="q" placeholder="搜尋商品名稱">
+        <input type="number" name="min_price" placeholder="最低價格">
+        <input type="number" name="max_price" placeholder="最高價格">
+        <button type="submit">搜尋</button>
+    </form>
     <title>商品列表</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        header a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px;
+            text-align: center;
+            background: #fefefe;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 22%;
+        }
+        .product img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .product h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+        .product p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .product button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .product button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <!-- 頁面標題 -->
-        <header class="mb-4">
-            <h1 class="text-center">商品列表</h1>
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    {% if session.get('user_name') %}
-                        <p>歡迎, <strong>{{ session['user_name'] }}</strong>!</p>
-                        <a href="{{ url_for('main.logout') }}" class="btn btn-danger btn-sm">登出</a>
-                    {% else %}
-                        <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-sm">登錄</a>
-                        <a href="{{ url_for('main.register') }}" class="btn btn-secondary btn-sm">註冊</a>
-                    {% endif %}
-                </div>
-                <a href="{{ url_for('main.cart') }}" class="btn btn-warning btn-sm">查看購物車</a>
-            </div>
-        </header>
-
-        <!-- 商品列表 -->
-        <hr>
-        <div class="row">
+    <header>
+        <h1>商品列表</h1>
+        <div>
+            {% if session['user_name'] %}
+                <span>歡迎, {{ session['user_name'] }}</span>
+                <a href="{{ url_for('main.logout') }}">登出</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">登錄</a>
+                <a href="{{ url_for('main.register') }}">註冊</a>
+            {% endif %}
+            <a href="{{ url_for('main.cart') }}">查看購物車</a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="products">
             {% for product in products %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text">{{ product.description }}</p>
-                        <p class="card-text"><strong>價格:</strong> ${{ product.price }}</p>
-                        <p class="card-text"><strong>庫存:</strong> {{ product.stock }}</p>
-                        <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST">
-                            <button type="submit" class="btn btn-success w-100">加入購物車</button>
-                        </form>
-                    </div>
-                </div>
+            <div class="product">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <p>價格: ${{ product.price }}</p>
+                <p>庫存: {{ product.stock }}</p>
+                <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST">
+                    <button type="submit">加入購物車</button>
+                </form>
             </div>
             {% endfor %}
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
