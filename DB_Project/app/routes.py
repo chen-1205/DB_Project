@@ -4,9 +4,6 @@ from .models import User, Product, CartItem, Order, OrderItem, db
 
 main = Blueprint('main', __name__)
 
-
-
-
 @main.route('/')
 def index():
     products = Product.query.all()
