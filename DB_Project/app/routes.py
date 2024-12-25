@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User, Product, CartItem, Order, OrderItem, db
+from flask import Blueprint, render_template, request, session, flash, redirect, url_for
+from .models import Product, User, Order, CartItem,OrderItem, db # 確保導入 Product 模型
+from werkzeug.security import check_password_hash, generate_password_hash
+
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
+    # 獲取所有商品
     products = Product.query.all()
     return render_template('index.html', products=products)
 
@@ -71,7 +73,7 @@ def update_cart_item(cart_item_id):
     flash('購物車已更新！')
     return redirect(url_for('main.cart'))
 
-@main.route('/add_to_cart/<int:product_id>', methods=['POST'])
+@main.route('/cart/add/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     if 'user_id' not in session:
         flash('請先登錄！')
@@ -184,15 +186,6 @@ def edit_product(product_id):
     product.stock = int(request.form['stock'])
     product.image_url = request.form['image_url']
     db.session.commit()
-    flash('商品已更新！')
-    return redirect(url_for('main.admin_products'))
-
-
-@main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
-def delete_product(product_id):
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
 
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)
@@ -241,3 +234,17 @@ def order_details(order_id):
         return redirect(url_for('main.orders'))
 
     return render_template('order_details.html', order=order)
+    flash('商品已更新！')
+    return redirect(url_for('main.admin_products'))
+
+@main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    if not session.get('is_admin', False):
+        flash('需要管理員權限！')
+        return redirect(url_for('main.index'))
+
+
+
+
+
+
