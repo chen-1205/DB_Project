@@ -68,10 +68,17 @@
             </div>
         </form> 
     </div>
+    <div id="message">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div>
+                    {% for message in messages %}
+                        <p style="color: black; text-align: center;">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
 
-    <script>
-        
-
-    </script>
 </body>
 </html>

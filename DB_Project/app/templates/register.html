@@ -32,9 +32,9 @@
         } 
         .button-container {
         display: flex;
-        justify-content: center; /* 水平居中 */
-        align-items: center;    /* 垂直居中 */
-        height: 50px;          /* 可选：设置父容器高度 */
+        justify-content: center; 
+        align-items: center;    
+        height: 50px;          
         background-color: #f9f9f9;
         }
         .centered-button {
@@ -63,14 +63,26 @@
             
             <input type="password" id="password" name="password" placeholder="請輸入你的密碼" required><br>
             
+            <div class="button-container">
+                <button class="cnetered-button" type="submit">註冊</button>
+                <p style="text-align: center;">
+                    已有帳戶? <a href="{{ url_for('main.login') }}">登錄</a>
+                </p>
+            </div>
         </form>
-        <div class="button-container">
-            <button class="cnetered-button" type="submit">註冊</button>
-            <p style="text-align: center;">
-                已有帳戶? <a href="{{ url_for('main.login') }}">登錄</a>
-            </p>
-        </div>
-
     </div>
+
+    <div id="message">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div>
+                    {% for message in messages %}
+                        <p style="color: black; text-align: center;">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
 </body>
 </html>
