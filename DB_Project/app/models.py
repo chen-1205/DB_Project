@@ -20,6 +20,9 @@ class Order(db.Model):
     status = db.Column(db.String(20), default='Pending')
     total_price = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    recipient_name = db.Column(db.String(100), nullable=False)  
+    recipient_address = db.Column(db.String(255), nullable=False)  
+    recipient_phone = db.Column(db.String(20), nullable=False)  
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)

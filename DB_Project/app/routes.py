@@ -39,7 +39,7 @@ def login():
             flash('登錄成功！')
             return redirect(url_for('main.index'))
         else:
-            flash('登錄失敗，請檢查電子郵件和密碼。')
+            flash('登入失敗，請檢查電子郵件和密碼。')
     return render_template('login.html')
 
 @main.route('/logout')
@@ -51,7 +51,7 @@ def logout():
 @main.route('/cart', methods=['GET'])
 def cart():
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
     cart_items = CartItem.query.filter_by(user_id=session['user_id']).all()
     total_price = sum(item.product.price * item.quantity for item in cart_items)
@@ -60,7 +60,7 @@ def cart():
 @main.route('/update_cart_item/<int:cart_item_id>', methods=['POST'])
 def update_cart_item(cart_item_id):
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
 
     cart_item = CartItem.query.get_or_404(cart_item_id)
@@ -76,7 +76,7 @@ def update_cart_item(cart_item_id):
 @main.route('/cart/add/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
@@ -96,7 +96,7 @@ def add_to_cart(product_id):
 @main.route('/remove_from_cart/<int:cart_item_id>', methods=['POST'])
 def remove_from_cart(cart_item_id):
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
     
     cart_item = CartItem.query.get_or_404(cart_item_id)
@@ -108,7 +108,7 @@ def remove_from_cart(cart_item_id):
 @main.route('/checkout', methods=['POST'])
 def checkout():
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
@@ -117,11 +117,25 @@ def checkout():
         flash('購物車是空的！')
         return redirect(url_for('main.index'))
 
+    # 接收收件人訊息
+    recipient_name = request.form['recipient_name']
+    recipient_address = request.form['recipient_address']
+    recipient_phone = request.form['recipient_phone']
+
+    # 創建新訂單
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-    new_order = Order(user_id=user_id, total_price=total_price, status='待處理')
+    new_order = Order(
+        user_id=user_id,
+        total_price=total_price,
+        status='待處理',
+        recipient_name=recipient_name,
+        recipient_address=recipient_address,
+        recipient_phone=recipient_phone
+    )
     db.session.add(new_order)
     db.session.commit()
 
+    # 添加訂單項目並清空購物車
     for item in cart_items:
         order_item = OrderItem(
             order_id=new_order.id,
@@ -131,22 +145,27 @@ def checkout():
             price=item.product.price
         )
         db.session.add(order_item)
-
         item.product.stock -= item.quantity
-        db.session.delete(item)   
+        db.session.delete(item)
 
     db.session.commit()
 
-    flash('訂單成立！')
+    flash('訂單已成功提交！')
     return redirect(url_for('main.orders'))
 
-
-#########################################################
+@main.route('/checkout_page', methods=['GET'])
+def checkout_page():
+    if 'user_id' not in session:
+        flash('請先登入！')
+        return redirect(url_for('main.login'))
+    
+    # 渲染 checkout.html
+    return render_template('checkout.html')
 
 @main.route('/orders', methods=['GET'])
 def orders():
     if 'user_id' not in session:
-        flash('請先登錄！')
+        flash('請先登入！')
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
@@ -155,76 +174,15 @@ def orders():
     return render_template('orders.html', orders=user_orders)
 
 
-@main.route('/admin/edit_product/<int:product_id>', methods=['POST'])
-def edit_product(product_id):
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
-
-    product = Product.query.get_or_404(product_id)
-    product.name = request.form['name']
-    product.price = float(request.form['price'])
-    product.stock = int(request.form['stock'])
-    product.image_url = request.form['image_url']
-    db.session.commit()
-
-    product = Product.query.get_or_404(product_id)
-    db.session.delete(product)
-    db.session.commit()
-    flash('商品已刪除！')
-    return redirect(url_for('main.admin_products'))
-
-@main.route('/admin/orders', methods=['GET', 'POST'])
-def admin_orders():
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
-
-    if request.method == 'POST':
-        order_id = int(request.form['order_id'])
-        new_status = request.form['status']
-        order = Order.query.get_or_404(order_id)
-        order.status = new_status
-        db.session.commit()
-        flash(f'訂單狀態已更新為 {new_status}！')
-
-    orders = Order.query.all()
-    return render_template('admin_orders.html', orders=orders)
-
-@main.route('/search', methods=['GET'])
-def search():
-    query = request.args.get('q', '').strip()
-    min_price = request.args.get('min_price', type=float, default=0)
-    max_price = request.args.get('max_price', type=float, default=float('inf'))
-    products = Product.query.filter(
-        Product.name.ilike(f'%{query}%'),
-        Product.price >= min_price,
-        Product.price <= max_price
-    ).all()
-    return render_template('index.html', products=products)
-
 @main.route('/order/<int:order_id>', methods=['GET'])
-def order_details(order_id):
-    if 'user_id' not in session:
-        flash('請先登錄！')
-        return redirect(url_for('main.login'))
-
+def order_detail(order_id):
+    # 從資料庫查找訂單
     order = Order.query.get_or_404(order_id)
-    if order.user_id != session['user_id'] and not session.get('is_admin', False):
-        flash('您無權查看此訂單！')
+    if 'user_id' not in session or session['user_id'] != order.user_id:
+        flash("無權查看此訂單！")
         return redirect(url_for('main.orders'))
 
-    return render_template('order_details.html', order=order)
-    flash('商品已更新！')
-    return redirect(url_for('main.admin_products'))
-
-@main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
-def delete_product(product_id):
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
-
-
+    return render_template('order_detail.html', order=order)
 
 
 

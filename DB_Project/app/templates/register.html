@@ -45,10 +45,28 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .back-to-home {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .back-to-home:hover {
+            background-color: #0056b3;
+        }
 
     </style>
 </head>
 <body>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('main.index') }}" class="back-to-home">回到首頁</a>
+    </div>
     <div class="container">
         <h1>註冊</h1>
         <form method="POST" action="{{ url_for('main.register') }}">
