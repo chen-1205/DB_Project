@@ -140,38 +140,19 @@ def checkout():
     flash('訂單成立！')
     return redirect(url_for('main.orders'))
 
+
+#########################################################
+
 @main.route('/orders', methods=['GET'])
 def orders():
     if 'user_id' not in session:
         flash('請先登錄！')
         return redirect(url_for('main.login'))
-    
+
     user_id = session['user_id']
-    orders = Order.query.filter_by(user_id=user_id).all()
-    return render_template('orders.html', orders=orders)
+    user_orders = Order.query.filter_by(user_id=user_id).all()
 
-#########################################################
-
-@main.route('/admin/products', methods=['GET', 'POST'])
-def admin_products():
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
-
-    if request.method == 'POST':
-        # 新增商品
-        name = request.form['name']
-        price = float(request.form['price'])
-        stock = int(request.form['stock'])
-        image_url = request.form['image_url']
-        new_product = Product(name=name, price=price, stock=stock, image_url=image_url)
-        db.session.add(new_product)
-        db.session.commit()
-        flash('商品已新增！')
-        return redirect(url_for('main.admin_products'))
-
-    products = Product.query.all()
-    return render_template('admin_products.html', products=products)
+    return render_template('orders.html', orders=user_orders)
 
 
 @main.route('/admin/edit_product/<int:product_id>', methods=['POST'])

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的訂單</title>
+    <title>訂單詳情</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
         }
         .container {
             max-width: 800px;
@@ -19,69 +19,46 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        .order-header {
+            font-weight: bold;
+            font-size: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .order-info {
+            margin-bottom: 15px;
         }
-        table th, table td {
-            text-align: left;
-            padding: 10px;
+        .order-item {
             border-bottom: 1px solid #ddd;
+            padding: 10px 0;
         }
-        table th {
-            background-color: #f4f4f4;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        a {
-            color: white;
+        .back-link {
             text-decoration: none;
+            color: #007bff;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>我的訂單</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>訂單編號</th>
-                    <th>總價格</th>
-                    <th>狀態</th>
-                    <th>建立時間</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>${{ order.total_price }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>{{ order.created_at }}</td>
-                    <td>
-                        <button>
-                            <a href="{{ url_for('main.order_details', order_id=order.id) }}">查看詳情</a>
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h1>訂單詳情</h1>
+        <p class="order-header">訂單編號: {{ order.id }}</p>
+        <p class="order-info">總價格: ${{ order.total_price }}</p>
+        <p class="order-info">狀態: {{ order.status }}</p>
+        <p class="order-info">創建日期: {{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
+        <h3>訂單商品：</h3>
+        <ul>
+            {% for item in order.order_items %}
+            <li class="order-item">
+                <strong>商品名稱:</strong> {{ item.product_name }} <br>
+                <strong>數量:</strong> {{ item.quantity }} <br>
+                <strong>價格:</strong> ${{ item.price }}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('main.orders') }}" class="back-link">返回我的訂單</a>
     </div>
 </body>
 </html>
