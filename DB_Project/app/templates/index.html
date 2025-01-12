@@ -36,7 +36,7 @@
                 <div class="product-info">
                     <h3>{{ product.name }}</h3>
                     <p>價格 : ${{ product.price }}</p>
-                    <p>數量 : ${{ product.stock }}</p>
+                    <p>數量 : {{ product.stock }}</p>
                     <button onclick="addToCart('{{ product.id }}')">加入購物車</button>
                 </div>
             </div>
