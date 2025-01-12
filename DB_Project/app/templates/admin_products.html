@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理商品</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>管理商品</h1>
+
+        <!-- 新增商品表單 -->
+        <form method="POST" action="{{ url_for('main.admin_products') }}">
+            <label for="name" class="form-label">商品名稱</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+
+            <label for="price" class="form-label">價格</label>
+            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+
+            <label for="stock" class="form-label">庫存</label>
+            <input type="number" class="form-control" id="stock" name="stock" required>
+
+            <label for="image_url" class="form-label">圖片名稱</label>
+            <input type="text" class="form-control" id="image_url" name="image_url" required>
+
+            <button type="submit" class="btn btn-primary">新增商品</button>
+        </form>
+
+        <!-- 上傳圖片 -->
+        <form method="POST" action="{{ url_for('main.upload_image') }}" enctype="multipart/form-data" class="upload-section">
+            <label for="image" class="form-label">上傳商品圖片</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <button type="submit" class="btn btn-secondary">上傳圖片</button>
+        </form>
+
+        <!-- 商品列表 -->
+        <h2>商品列表</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>名稱</th>
+                    <th>價格</th>
+                    <th>庫存</th>
+                    <th>圖片</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>${{ product.price }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        {% if product.image_url %}
+                        <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                        {% else %}
+                        無圖片
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('main.delete_product', product_id=product.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">刪除</button>
+                        </form>
+                        <a href="{{ url_for('main.edit_product', product_id=product.id) }}" class="btn btn-warning">編輯</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 回首頁 -->
+        <a href="{{ url_for('main.admin_dashboard') }}" class="back-to-home">回到首頁</a>
+    </div>
+</body>
+</html>

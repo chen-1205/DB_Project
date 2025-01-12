@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, request, session, flash, redirect, url_for, abort
+import os
+from flask import Blueprint, render_template, request, session, flash, redirect, url_for, abort, current_app
 from .models import Product, User, Order, CartItem,OrderItem, db # 確保導入 Product 模型
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 
 main = Blueprint('main', __name__)
@@ -68,6 +70,12 @@ def update_cart_item(cart_item_id):
 
     cart_item = CartItem.query.get_or_404(cart_item_id)
     new_quantity = int(request.form['quantity'])
+
+    # 確保新的購物車數量不超過商品庫存
+    if new_quantity > cart_item.product.stock:
+        flash(f'商品 "{cart_item.product.name}" 的庫存不足，請減少購買數量！', 'error')
+        return redirect(url_for('main.cart'))
+
     if new_quantity <= 0:
         db.session.delete(cart_item)
     else:
@@ -116,9 +124,16 @@ def checkout():
 
     user_id = session['user_id']
     cart_items = CartItem.query.filter_by(user_id=user_id).all()
+    
     if not cart_items:
         flash('購物車是空的！')
         return redirect(url_for('main.index'))
+
+    for item in cart_items:
+        if item.quantity > item.product.stock:
+            flash(f'商品 "{item.product.name}" 的庫存不足！請調整購物車數量。', 'error')
+            print(f"庫存不足檢查: {item.product.name} - 購買量: {item.quantity}, 庫存: {item.product.stock}")
+            return redirect(url_for('main.cart'))
 
     # 接收收件人訊息
     recipient_name = request.form['recipient_name']
@@ -138,8 +153,16 @@ def checkout():
     db.session.add(new_order)
     db.session.commit()
 
-    # 添加訂單項目並清空購物車
+    # 添加訂單項目並更新庫存
     for item in cart_items:
+        # 減少庫存
+        item.product.stock -= item.quantity
+        # 如果庫存變為負數，回滾數據庫操作並提示錯誤
+        if item.product.stock < 0:
+            db.session.rollback()
+            flash(f'商品 "{item.product.name}" 的庫存不足，訂單未成功提交！', 'error')
+            return redirect(url_for('main.cart'))
+
         order_item = OrderItem(
             order_id=new_order.id,
             product_id=item.product.id,
@@ -148,7 +171,6 @@ def checkout():
             price=item.product.price
         )
         db.session.add(order_item)
-        item.product.stock -= item.quantity
         db.session.delete(item)
 
     db.session.commit()
@@ -187,24 +209,7 @@ def order_detail(order_id):
 
     return render_template('order_detail.html', order=order)
 
-@main.route('/admin/edit_product/<int:product_id>', methods=['POST'])
-def edit_product(product_id):
-    if not session.get('is_admin', False):
-        flash('需要管理員權限！')
-        return redirect(url_for('main.index'))
 
-    product = Product.query.get_or_404(product_id)
-    product.name = request.form['name']
-    product.price = float(request.form['price'])
-    product.stock = int(request.form['stock'])
-    product.image_url = request.form['image_url']
-    db.session.commit()
-
-    product = Product.query.get_or_404(product_id)
-    db.session.delete(product)
-    db.session.commit()
-    flash('商品已刪除！')
-    return redirect(url_for('main.admin_products'))
 
 @main.route('/admin/orders', methods=['GET', 'POST'])
 def admin_orders():
@@ -281,16 +286,12 @@ def delete_users(user_id):
 
 @main.route('/admin/orders/<int:order_id>', methods=['GET'])
 def admin_order_details(order_id):
-    if 'user_id' not in session:
-        flash('請先登錄！')
+    if not session.get('is_admin', False):
+        flash('需要管理員權限！')
         return redirect(url_for('main.login'))
 
     order = Order.query.get_or_404(order_id)
-    if not session.get('is_admin'):
-        flash('您無權查看此訂單！')
-        return redirect(url_for('main.admin_orders'))
-
-    return render_template('admin_order_detail', order=order)
+    return render_template('admin/admin_order_detail.html', order=order)
 
 @main.route('/update_order_status/<int:order_id>', methods=['POST'])
 def update_order_status(order_id):
@@ -310,3 +311,80 @@ def update_order_status(order_id):
         flash('找不到該訂單', 'error')
 
     return redirect(url_for('main.admin_orders', order_id=order_id))
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+# 管理員查看商品頁面
+@main.route('/admin/products', methods=['GET', 'POST'])
+def admin_products():
+    if request.method == 'POST':
+        name = request.form['name']
+        price = float(request.form['price'])
+        stock = int(request.form['stock'])
+        image_url = request.form['image_url']  # 手動輸入或上傳圖片文件名
+
+        new_product = Product(name=name, price=price, stock=stock, image_url=image_url)
+        db.session.add(new_product)
+        db.session.commit()
+
+        flash('商品新增成功！', 'success')
+        return redirect(url_for('main.admin_products'))
+
+    products = Product.query.all()
+    return render_template('admin_products.html', products=products)
+
+# 文件上傳路由
+@main.route('/admin/upload_image', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        flash('沒有選擇文件', 'error')
+        return redirect(url_for('main.admin_products'))
+
+    file = request.files['image']
+    if file.filename == '':
+        flash('文件名稱為空', 'error')
+        return redirect(url_for('main.admin_products'))
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+
+        # 確保目錄存在
+        os.makedirs(current_app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+        # 保存文件到指定路徑
+        file.save(file_path)
+
+        flash(f'圖片 {filename} 上傳成功！', 'success')
+        return redirect(url_for('main.admin_products'))
+    else:
+        flash('文件格式不支持！', 'error')
+        return redirect(url_for('main.admin_products'))
+
+# 刪除商品
+@main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    db.session.delete(product)
+    db.session.commit()
+    flash('商品已刪除！', 'success')
+    return redirect(url_for('main.admin_products'))
+
+# 更新商品
+@main.route('/admin/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    if request.method == 'POST':
+        product.name = request.form['name']
+        product.price = float(request.form['price'])
+        product.stock = int(request.form['stock'])
+        product.image_url = request.form['image_url']
+
+        db.session.commit()
+        flash('商品已更新！', 'success')
+        return redirect(url_for('main.admin_products'))
+
+    return render_template('edit_product.html', product=product)

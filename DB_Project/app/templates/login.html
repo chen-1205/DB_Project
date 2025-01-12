@@ -4,64 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登入</title>
-    <style>
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-        .container {
-            max-width: 350px;
-            margin: 100px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .txt1 {
-            display: inline-block;
-            width: 100px;
-            text-align: right;
-        } 
-        .button-container {
-        display: flex;
-        justify-content: center; /* 水平居中 */
-        align-items: center;    /* 垂直居中 */
-        height: 50px;          /* 可选：设置父容器高度 */
-        background-color: #f9f9f9;
-        }
-        .centered-button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .back-to-home {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .back-to-home:hover {
-            background-color: #0056b3;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
     <div style="text-align: center; margin-top: 20px;">

@@ -4,67 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>購物車</title>
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .back-to-home {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .back-to-home:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
+    <!-- 回到首頁按鈕 -->
     <div style="text-align: center; margin-top: 20px;">
         <a href="{{ url_for('main.index') }}" class="back-to-home">回到首頁</a>
     </div>
+
+    <div id="message">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+    <!-- 購物車內容 -->
     <div class="container">
         <h1>購物車</h1>
 
         {% if cart_items %}
-        <table>
+        <table class="table">
             <thead>
                 <tr>
                     <th>商品名稱</th>
                     <th>數量</th>
-                    <th>價格</th>
+                    <th>單價</th>
+                    <th>小計</th>
+                    <th>剩餘庫存</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -73,15 +44,24 @@
                 <tr>
                     <td>{{ item.product.name }}</td>
                     <td>
+                        <!-- 更新數量表單 -->
                         <form method="POST" action="{{ url_for('main.update_cart_item', cart_item_id=item.id) }}">
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" required>
-                            <button type="submit">更新</button>
+                            <input type="number" 
+                                   name="quantity" 
+                                   value="{{ item.quantity }}" 
+                                   min="1" 
+                                   max="{{ item.product.stock }}" 
+                                   required>
+                            <button type="submit" class="btn btn-primary">更新</button>
                         </form>
                     </td>
+                    <td>${{ item.product.price }}</td>
                     <td>${{ item.product.price * item.quantity }}</td>
+                    <td>{{ item.product.stock }}</td>
                     <td>
+                        <!-- 移除商品表單 -->
                         <form method="POST" action="{{ url_for('main.remove_from_cart', cart_item_id=item.id) }}">
-                            <button type="submit">移除</button>
+                            <button type="submit" class="btn btn-danger">移除</button>
                         </form>
                     </td>
                 </tr>
@@ -89,15 +69,16 @@
             </tbody>
         </table>
 
+        <!-- 顯示總金額 -->
         <h3>總金額: ${{ total_price }}</h3>
 
-        <!-- 結帳按鈕，跳轉到 checkout.html -->
+        <!-- 結帳按鈕 -->
         <form method="GET" action="{{ url_for('main.checkout_page') }}">
-            <button type="submit">結帳</button>
+            <button type="submit" class="btn btn-success">結帳</button>
         </form>
 
         {% else %}
-        <p>購物車是空的！</p>
+        <p class="no-orders">購物車是空的！</p>
         {% endif %}
     </div>
 </body>

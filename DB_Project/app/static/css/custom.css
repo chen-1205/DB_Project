@@ -1,0 +1,307 @@
+/* 通用樣式 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* 標題樣式 */
+h1, h2 {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* 表格樣式 */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table td img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* 表單樣式 */
+.form-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+/* 按鈕樣式 */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    transition: background-color 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    transition: background-color 0.3s;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.back-to-home {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.back-to-home:hover {
+    background-color: #0056b3;
+}
+
+/* 提示訊息樣式 */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* 圖片上傳 */
+.upload-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.upload-section input[type="file"] {
+    margin-top: 10px;
+}
+
+/* 列表元素樣式 */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    margin: 10px 0;
+    text-align: center;
+}
+
+/* 偶數與奇數行分隔 */
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+/* 表格內容 hover 效果 */
+.table tr:hover {
+    background-color: #eef2f3;
+}
+
+/* 商品列表容器 */
+#product-list {
+    display: flex;
+    flex-wrap: wrap; /* 自動換行 */
+    gap: 20px; /* 商品之間的間距 */
+    justify-content: center; /* 水平居中 */
+    align-items: flex-start; /* 垂直頂部對齊 */
+}
+
+/* 單個商品卡片 */
+.product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 220px; /* 固定寬度 */
+    height: 300px; /* 固定高度 */
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* 商品圖片 */
+.product img {
+    max-width: 150px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* 商品名稱 */
+.product-info h3 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #007bff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 商品價格 */
+.product-info p {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+
+/* 加入購物車按鈕 */
+.product-info button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.product-info button:hover {
+    background-color: #0056b3;
+}
+
+.error {
+    color: #dc3545;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.success {
+    color: #28a745;
+    font-weight: bold;
+    margin: 10px 0;
+}

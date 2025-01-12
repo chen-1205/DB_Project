@@ -12,7 +12,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     stock = db.Column(db.Integer, default=0)
-    image_url = db.Column(db.String(255), nullable=True)
+    image_url = db.Column(db.String(200), nullable=True)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)

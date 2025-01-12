@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>編輯商品</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}"></head>
+<body>
+    <div class="container mt-5">
+        <h1>編輯商品</h1>
+        <form method="POST" action="{{ url_for('main.edit_product', product_id=product.id) }}">
+            <div class="mb-3">
+                <label for="name" class="form-label">商品名稱</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">價格</label>
+                <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" step="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">庫存</label>
+                <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="image_url" class="form-label">圖片名稱</label>
+                <input type="text" class="form-control" id="image_url" name="image_url" value="{{ product.image_url }}">
+            </div>
+            <button type="submit" class="btn btn-primary">保存更改</button>
+        </form>
+    </div>
+</body>
+</html>
