@@ -15,7 +15,4 @@ if __name__ == "__main__":
         initialize_admin()
         print("啟動服務器...")
 
-    
-
-
     app.run(debug=True)
