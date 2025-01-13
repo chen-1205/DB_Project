@@ -10,28 +10,29 @@
     <div class="container">
         <h1>管理商品</h1>
 
-        <!-- 新增商品表單 -->
-        <form method="POST" action="{{ url_for('main.admin_products') }}">
+        <form method="POST" action="{{ url_for('main.upload_product_with_image') }}" enctype="multipart/form-data" class="upload-section">
+            <!-- 商品名稱 -->
             <label for="name" class="form-label">商品名稱</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-
+            <input type="text" id="name" name="name" class="form-control" placeholder="請輸入商品名稱" required>
+        
+            <!-- 商品價格 -->
             <label for="price" class="form-label">價格</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-
+            <input type="number" id="price" name="price" class="form-control" required>
+        
+            <!-- 商品庫存 -->
             <label for="stock" class="form-label">庫存</label>
-            <input type="number" class="form-control" id="stock" name="stock" required>
-
-            <label for="image_url" class="form-label">圖片名稱</label>
-            <input type="text" class="form-control" id="image_url" name="image_url" required>
-
-            <button type="submit" class="btn btn-primary">新增商品</button>
-        </form>
-
-        <!-- 上傳圖片 -->
-        <form method="POST" action="{{ url_for('main.upload_image') }}" enctype="multipart/form-data" class="upload-section">
+            <input type="number" id="stock" name="stock" class="form-control" required>
+        
+            <!-- 圖片名稱 -->
+            <label for="image_name" class="form-label">圖片名稱</label>
+            <input type="text" id="image_name" name="image_name" class="form-control" placeholder="請輸入圖片名稱，不包含副檔名" required>
+        
+            <!-- 上傳圖片 -->
             <label for="image" class="form-label">上傳商品圖片</label>
-            <input type="file" id="image" name="image" accept="image/*">
-            <button type="submit" class="btn btn-secondary">上傳圖片</button>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        
+            <!-- 提交按鈕 -->
+            <button type="submit" class="btn btn-primary">新增商品並上傳圖片</button>
         </form>
 
         <!-- 商品列表 -->
@@ -56,7 +57,7 @@
                     <td>{{ product.stock }}</td>
                     <td>
                         {% if product.image_url %}
-                        <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                        <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}">
                         {% else %}
                         無圖片
                         {% endif %}

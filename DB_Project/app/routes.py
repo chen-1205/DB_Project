@@ -1,4 +1,6 @@
 import os
+import uuid
+from datetime import datetime
 from flask import Blueprint, render_template, request, session, flash, redirect, url_for, abort, current_app
 from .models import Product, User, Order, CartItem,OrderItem, db # 確保導入 Product 模型
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -312,18 +314,19 @@ def update_order_status(order_id):
 
     return redirect(url_for('main.admin_orders', order_id=order_id))
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
-# 管理員查看商品頁面
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @main.route('/admin/products', methods=['GET', 'POST'])
 def admin_products():
     if request.method == 'POST':
         name = request.form['name']
-        price = float(request.form['price'])
+        price = int(request.form['price'])
         stock = int(request.form['stock'])
-        image_url = request.form['image_url']  # 手動輸入或上傳圖片文件名
+        image_url = request.form['image_url']  
 
         new_product = Product(name=name, price=price, stock=stock, image_url=image_url)
         db.session.add(new_product)
@@ -335,33 +338,57 @@ def admin_products():
     products = Product.query.all()
     return render_template('admin_products.html', products=products)
 
-# 文件上傳路由
-@main.route('/admin/upload_image', methods=['POST'])
-def upload_image():
-    if 'image' not in request.files:
-        flash('沒有選擇文件', 'error')
+@main.route('/admin/upload_product_with_image', methods=['POST'])
+def upload_product_with_image():
+    import uuid
+
+    # 獲取表單資料
+    name = request.form.get('name')
+    price = request.form.get('price')
+    stock = request.form.get('stock')
+    image_name = request.form.get('image_name')  # 用戶輸入的圖片名稱
+    file = request.files.get('image')
+
+    # 驗證必填欄位
+    if not name or not price or not stock or not image_name or not file:
+        flash('所有欄位均為必填項！', 'error')
         return redirect(url_for('main.admin_products'))
 
-    file = request.files['image']
-    if file.filename == '':
-        flash('文件名稱為空', 'error')
-        return redirect(url_for('main.admin_products'))
-
+    # 檢查圖片檔案是否合法
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        # 為檔案名稱添加副檔名
+        extension = os.path.splitext(file.filename)[1].lower()  # 獲取副檔名並轉為小寫
+        # if not extension:
+        #     flash('圖片缺少副檔名！', 'error')
+        #     return redirect(url_for('main.admin_products'))
+        
+        # 使用用戶輸入的圖片名稱和副檔名生成檔案名稱
+        filename = f"{image_name}{extension}"
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
         # 確保目錄存在
         os.makedirs(current_app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-        # 保存文件到指定路徑
+        # 儲存圖片檔案
         file.save(file_path)
-
-        flash(f'圖片 {filename} 上傳成功！', 'success')
-        return redirect(url_for('main.admin_products'))
     else:
-        flash('文件格式不支持！', 'error')
+        flash('圖片檔案格式不支援！', 'error')
         return redirect(url_for('main.admin_products'))
+
+    # 新增商品到資料庫
+    new_product = Product(
+        name=name,
+        price=int(price),
+        stock=int(stock),
+        image_url=filename  # 資料庫中儲存檔案名稱
+    )
+    db.session.add(new_product)
+    db.session.commit()
+
+    flash(f'商品 "{name}" 新增成功，圖片 "{filename}" 已上傳！', 'success')
+    return redirect(url_for('main.admin_products'))
+
+
 
 # 刪除商品
 @main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
