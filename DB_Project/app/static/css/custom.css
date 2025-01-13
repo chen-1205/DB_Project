@@ -305,3 +305,33 @@ ul li {
     font-weight: bold;
     margin: 10px 0;
 }
+
+.btn-logout {
+    background-color: #ff4d4d; 
+    color: white; 
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease; 
+}
+
+.btn-logout:hover {
+    background-color: #cc0000;
+}
+
+.btn-checkout {
+    background-color: #28a745; 
+    color: white; 
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease; 
+}
+
+.btn-checkout:hover {
+    background-color: #218838; 
+}

@@ -8,36 +8,30 @@
 <body>
     <div class="container mt-5">
         <h1>用戶管理</h1>
-        <form method="POST" action="{{ url_for('main.list_users') }}">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>用戶名字</th>
-                        <th>Email</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>
-                            {{ user.name }}
-                        </td>
-                        <td>
-                            {{ user.email }}
-                        </td>
-                        <td>
-                            <form action="{{ url_for('main.delete_users', user_id=user.id) }}" method="POST" >
-                                <button type="submit" class="btn btn-primary">刪除</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </form>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用戶名字</th>
+                    <th>Email</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <form action="{{ url_for('main.delete_users', user_id=user.id) }}" method="POST">
+                            <button type="submit" class="btn btn-primary">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     <div class="button-container">
         <a href="{{ url_for('main.admin_dashboard') }}" class="back-to-home">回到首頁</a>

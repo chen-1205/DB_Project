@@ -255,19 +255,20 @@ def order_details(order_id):
 
     return render_template('order_detail.html', order=order)
 
-@main.route('/admin/users')
-def list_users():
-    if not session.get('is_admin', False):
-        return redirect(url_for('main.index'))
-
-    users = User.query.filter_by(is_admin=False).all()
-    return render_template('admin/users.html', users=users)
 
 @main.route('/admin')
 def admin_dashboard():
     if not session.get('is_admin', False):
         return redirect(url_for('main.login'))
     return render_template('admin_dashboard.html')
+
+@main.route('/admin/users', methods=['GET', 'POST'])
+def list_users():
+    if request.method == 'POST':
+        pass
+    
+    users = User.query.filter(User.is_admin == 0)
+    return render_template('admin/users.html', users=users)
 
 @main.route('/admin/delete_users/<int:user_id>', methods=['POST'])
 def delete_users(user_id):
@@ -279,10 +280,10 @@ def delete_users(user_id):
     try:
         db.session.delete(user)
         db.session.commit()
-        flash(f'使用者 {user.username} 已刪除', 'success')
+        flash(f'使用者 {user.name} 已刪除', 'success')
     except Exception as e:
         db.session.rollback()
-        flash('刪除失敗，請稍後再試', 'error')
+        flash(f'刪除失敗，原因: {str(e)}', 'error')
 
     return redirect(url_for('main.list_users'))
 
@@ -358,9 +359,6 @@ def upload_product_with_image():
     if file and allowed_file(file.filename):
         # 為檔案名稱添加副檔名
         extension = os.path.splitext(file.filename)[1].lower()  # 獲取副檔名並轉為小寫
-        # if not extension:
-        #     flash('圖片缺少副檔名！', 'error')
-        #     return redirect(url_for('main.admin_products'))
         
         # 使用用戶輸入的圖片名稱和副檔名生成檔案名稱
         filename = f"{image_name}{extension}"
