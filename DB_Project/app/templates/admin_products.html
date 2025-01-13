@@ -74,6 +74,18 @@
 
         <!-- 回首頁 -->
         <a href="{{ url_for('main.admin_dashboard') }}" class="back-to-home">回到首頁</a>
+
+        <div id="message">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div>
+                        {% for message in messages %}
+                            <p style="color: black; text-align: center;">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
     </div>
 </body>
 </html>
