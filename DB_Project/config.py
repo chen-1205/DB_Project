@@ -5,6 +5,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.abspath('db_project.db')}"  
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    UPLOAD_FOLDER = 'app/static/images'  
+    UPLOAD_FOLDER = 'static/images'  
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}  
