@@ -230,17 +230,6 @@ def admin_orders():
     orders = Order.query.all()
     return render_template('admin_orders.html', orders=orders)
 
-@main.route('/search', methods=['GET'])
-def search():
-    query = request.args.get('q', '').strip()
-    min_price = request.args.get('min_price', type=float, default=0)
-    max_price = request.args.get('max_price', type=float, default=float('inf'))
-    products = Product.query.filter(
-        Product.name.ilike(f'%{query}%'),
-        Product.price >= min_price,
-        Product.price <= max_price
-    ).all()
-    return render_template('index.html', products=products)
 
 @main.route('/order/<int:order_id>', methods=['GET'])
 def order_details(order_id):
